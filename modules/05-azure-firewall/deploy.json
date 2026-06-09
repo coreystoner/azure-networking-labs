@@ -6,6 +6,11 @@
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": { "description": "Azure region. Defaults to resource group location." }
+    },
+    "sessionKey": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": { "description": "Session key for unique unlock code generation." }
     }
   },
   "resources": [
@@ -13,9 +18,7 @@
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2023-09-01",
       "name": "vnet-hub/AzureFirewallSubnet",
-      "properties": {
-        "addressPrefix": "10.0.4.0/26"
-      }
+      "properties": { "addressPrefix": "10.0.4.0/26" }
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
@@ -95,7 +98,11 @@
       "apiVersion": "2023-09-01",
       "name": "afw-hub",
       "location": "[parameters('location')]",
-      "tags": { "lab": "azure-networking-labs", "module": "05-azure-firewall" },
+      "tags": {
+        "lab": "azure-networking-labs",
+        "module": "05-azure-firewall",
+        "sessionKey": "[take(toUpper(parameters('sessionKey')), 8)]"
+      },
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'AzureFirewallSubnet')]",
         "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-afw-hub')]",

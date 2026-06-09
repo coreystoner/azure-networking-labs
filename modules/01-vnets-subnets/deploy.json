@@ -11,6 +11,11 @@
       "type": "string",
       "defaultValue": "10.0.0.0/16",
       "metadata": { "description": "Address prefix for the hub VNet." }
+    },
+    "sessionKey": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": { "description": "Session key for unique unlock code generation. Auto-generated on each deployment." }
     }
   },
   "resources": [
@@ -21,7 +26,8 @@
       "location": "[parameters('location')]",
       "tags": {
         "lab": "azure-networking-labs",
-        "module": "01-vnets-subnets"
+        "module": "01-vnets-subnets",
+        "sessionKey": "[take(toUpper(parameters('sessionKey')), 8)]"
       },
       "properties": {
         "addressSpace": {

@@ -6,6 +6,11 @@
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": { "description": "Azure region. Defaults to resource group location." }
+    },
+    "sessionKey": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": { "description": "Session key for unique unlock code generation." }
     }
   },
   "resources": [
@@ -14,7 +19,11 @@
       "apiVersion": "2023-09-01",
       "name": "vnet-spoke1",
       "location": "[parameters('location')]",
-      "tags": { "lab": "azure-networking-labs", "module": "03-peering" },
+      "tags": {
+        "lab": "azure-networking-labs",
+        "module": "03-peering",
+        "sessionKey": "[take(toUpper(parameters('sessionKey')), 8)]"
+      },
       "properties": {
         "addressSpace": { "addressPrefixes": [ "10.1.0.0/16" ] },
         "subnets": [

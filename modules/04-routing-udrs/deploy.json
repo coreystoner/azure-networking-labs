@@ -11,6 +11,11 @@
       "type": "string",
       "defaultValue": "10.0.4.4",
       "metadata": { "description": "IP of the hub NVA or Azure Firewall (Module 05)." }
+    },
+    "sessionKey": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": { "description": "Session key for unique unlock code generation." }
     }
   },
   "resources": [
@@ -19,7 +24,11 @@
       "apiVersion": "2023-09-01",
       "name": "rt-web",
       "location": "[parameters('location')]",
-      "tags": { "lab": "azure-networking-labs", "module": "04-routing-udrs" },
+      "tags": {
+        "lab": "azure-networking-labs",
+        "module": "04-routing-udrs",
+        "sessionKey": "[take(toUpper(parameters('sessionKey')), 8)]"
+      },
       "properties": {
         "disableBgpRoutePropagation": false,
         "routes": [
@@ -65,10 +74,7 @@
         "routes": [
           {
             "name": "blackhole-internet",
-            "properties": {
-              "addressPrefix": "0.0.0.0/0",
-              "nextHopType": "None"
-            }
+            "properties": { "addressPrefix": "0.0.0.0/0", "nextHopType": "None" }
           }
         ]
       }
