@@ -1,0 +1,26 @@
+# Azure CLI / deployment artifacts
+*.deploymentoutputs.json
+*.deploymentstate.json
+azure-deployment-*.json
+
+# Local parameter overrides (don't commit personal subscription IDs)
+*.local.bicepparam
+local.params.json
+
+# PowerShell
+*.ps1xml
+Profile.ps1
+
+# VS Code
+.vscode/settings.json
+.vscode/launch.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform (if added later)
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure Networking Labs</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-content">
+      <div class="header-brand">
+        <span class="header-icon">🌐</span>
+        <div>
+          <h1>Azure Networking Labs</h1>
+          <p>Self-paced labs for IT pros moving to Azure</p>
+        </div>
+      </div>
+      <div class="header-progress">
+        <div class="progress-label">
+          <span id="progress-text">0 / 7 complete</span>
+          <button class="reset-btn" onclick="confirmReset()">Reset Progress</button>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="intro-banner">
+      <strong>How it works:</strong> Deploy each module using the Bicep template, then run <code>validate.ps1</code> to verify your work.
+      Enter the unlock code it outputs to complete the module and access the next one.
+    </div>
+    <div class="module-grid" id="module-grid"></div>
+  </main>
+
+  <!-- Token entry modal -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="modal-title">Enter Unlock Code</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-description">Run <code>validate.ps1</code> in the module folder. If all checks pass, it will output your unlock code.</p>
+        <div class="token-input-group">
+          <input type="text" id="token-input" placeholder="ANL-MOD01-VNETS-COMPLETE"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 onkeydown="if(event.key==='Enter') submitToken()">
+          <button class="btn-primary" onclick="submitToken()">Unlock →</button>
+        </div>
+        <div class="token-feedback" id="token-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
