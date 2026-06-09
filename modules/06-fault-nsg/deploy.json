@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": { "description": "Azure region." }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-09-01",
+      "name": "nsg-web-fault",
+      "location": "[parameters('location')]",
+      "tags": { "lab": "azure-networking-labs", "module": "06-fault-nsg", "fault": "priority-ordering" },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Block-All-Inbound",
+            "properties": {
+              "priority": 90,
+              "protocol": "*", "access": "Deny", "direction": "Inbound",
+              "sourceAddressPrefix": "*", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "*",
+              "description": "Catch-all deny rule (misconfigured priority — BUG: should be 4000)"
+            }
+          },
+          {
+            "name": "Allow-HTTP-Inbound",
+            "properties": {
+              "priority": 100,
+              "protocol": "Tcp", "access": "Allow", "direction": "Inbound",
+              "sourceAddressPrefix": "Internet", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "80",
+              "description": "Allow HTTP from internet (never reached due to fault)"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2023-09-01",
+      "name": "vnet-hub/snet-web-fault",
+      "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web-fault')]" ],
+      "properties": {
+        "addressPrefix": "10.0.10.0/24",
+        "networkSecurityGroup": { "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web-fault')]" }
+      }
+    }
+  ],
+  "outputs": {
+    "nsgFaultId": { "type": "string", "value": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web-fault')]" }
+  }
+}

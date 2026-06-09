@@ -1,0 +1,135 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": { "description": "Azure region. Defaults to resource group location." }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-09-01",
+      "name": "nsg-web",
+      "location": "[parameters('location')]",
+      "tags": { "lab": "azure-networking-labs", "module": "02-nsgs" },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow-HTTP-Inbound",
+            "properties": {
+              "priority": 100, "protocol": "Tcp", "access": "Allow", "direction": "Inbound",
+              "sourceAddressPrefix": "Internet", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "80"
+            }
+          },
+          {
+            "name": "Allow-HTTPS-Inbound",
+            "properties": {
+              "priority": 110, "protocol": "Tcp", "access": "Allow", "direction": "Inbound",
+              "sourceAddressPrefix": "Internet", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "443"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-09-01",
+      "name": "nsg-app",
+      "location": "[parameters('location')]",
+      "tags": { "lab": "azure-networking-labs", "module": "02-nsgs" },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow-From-Web-Tier",
+            "properties": {
+              "priority": 100, "protocol": "*", "access": "Allow", "direction": "Inbound",
+              "sourceAddressPrefix": "10.0.1.0/24", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "*"
+            }
+          },
+          {
+            "name": "Deny-All-Other-Inbound",
+            "properties": {
+              "priority": 4000, "protocol": "*", "access": "Deny", "direction": "Inbound",
+              "sourceAddressPrefix": "*", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-09-01",
+      "name": "nsg-data",
+      "location": "[parameters('location')]",
+      "tags": { "lab": "azure-networking-labs", "module": "02-nsgs" },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow-From-App-Tier",
+            "properties": {
+              "priority": 100, "protocol": "*", "access": "Allow", "direction": "Inbound",
+              "sourceAddressPrefix": "10.0.2.0/24", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "*"
+            }
+          },
+          {
+            "name": "Deny-All-Other-Inbound",
+            "properties": {
+              "priority": 4000, "protocol": "*", "access": "Deny", "direction": "Inbound",
+              "sourceAddressPrefix": "*", "sourcePortRange": "*",
+              "destinationAddressPrefix": "*", "destinationPortRange": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2023-09-01",
+      "name": "vnet-hub/snet-web",
+      "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web')]" ],
+      "properties": {
+        "addressPrefix": "10.0.1.0/24",
+        "networkSecurityGroup": { "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web')]" }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2023-09-01",
+      "name": "vnet-hub/snet-app",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-app')]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'snet-web')]"
+      ],
+      "properties": {
+        "addressPrefix": "10.0.2.0/24",
+        "networkSecurityGroup": { "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-app')]" }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2023-09-01",
+      "name": "vnet-hub/snet-data",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-data')]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'snet-app')]"
+      ],
+      "properties": {
+        "addressPrefix": "10.0.3.0/24",
+        "networkSecurityGroup": { "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-data')]" }
+      }
+    }
+  ],
+  "outputs": {
+    "nsgWebId":  { "type": "string", "value": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web')]" },
+    "nsgAppId":  { "type": "string", "value": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-app')]" },
+    "nsgDataId": { "type": "string", "value": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-data')]" }
+  }
+}

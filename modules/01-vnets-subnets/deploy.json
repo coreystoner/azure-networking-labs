@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": { "description": "Azure region. Defaults to resource group location." }
+    },
+    "hubAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": { "description": "Address prefix for the hub VNet." }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2023-09-01",
+      "name": "vnet-hub",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "azure-networking-labs",
+        "module": "01-vnets-subnets"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [ "[parameters('hubAddressPrefix')]" ]
+        },
+        "subnets": [
+          { "name": "snet-web",  "properties": { "addressPrefix": "10.0.1.0/24" } },
+          { "name": "snet-app",  "properties": { "addressPrefix": "10.0.2.0/24" } },
+          { "name": "snet-data", "properties": { "addressPrefix": "10.0.3.0/24" } }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "vnetName":        { "type": "string", "value": "vnet-hub" },
+    "vnetId":          { "type": "string", "value": "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-hub')]" },
+    "vnetAddressSpace":{ "type": "string", "value": "[parameters('hubAddressPrefix')]" },
+    "subnetWebId":     { "type": "string", "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'snet-web')]" },
+    "subnetAppId":     { "type": "string", "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'snet-app')]" },
+    "subnetDataId":    { "type": "string", "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'snet-data')]" }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": { "description": "Azure region. Defaults to resource group location." }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2023-09-01",
+      "name": "vnet-hub/AzureFirewallSubnet",
+      "properties": {
+        "addressPrefix": "10.0.4.0/26"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2023-09-01",
+      "name": "pip-afw-hub",
+      "location": "[parameters('location')]",
+      "tags": { "lab": "azure-networking-labs", "module": "05-azure-firewall" },
+      "sku": { "name": "Standard", "tier": "Regional" },
+      "properties": { "publicIPAllocationMethod": "Static" }
+    },
+    {
+      "type": "Microsoft.Network/firewallPolicies",
+      "apiVersion": "2023-09-01",
+      "name": "afwp-hub",
+      "location": "[parameters('location')]",
+      "tags": { "lab": "azure-networking-labs", "module": "05-azure-firewall" },
+      "properties": {
+        "sku": { "tier": "Standard" },
+        "threatIntelMode": "Alert"
+      }
+    },
+    {
+      "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+      "apiVersion": "2023-09-01",
+      "name": "afwp-hub/lab-rules",
+      "dependsOn": [ "[resourceId('Microsoft.Network/firewallPolicies', 'afwp-hub')]" ],
+      "properties": {
+        "priority": 200,
+        "ruleCollections": [
+          {
+            "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+            "name": "network-rules",
+            "priority": 100,
+            "action": { "type": "Allow" },
+            "rules": [
+              {
+                "ruleType": "NetworkRule",
+                "name": "allow-dns-outbound",
+                "ipProtocols": [ "UDP" ],
+                "sourceAddresses": [ "10.0.0.0/16", "10.1.0.0/16" ],
+                "destinationAddresses": [ "*" ],
+                "destinationPorts": [ "53" ]
+              },
+              {
+                "ruleType": "NetworkRule",
+                "name": "allow-app-to-data-sql",
+                "ipProtocols": [ "TCP" ],
+                "sourceAddresses": [ "10.0.2.0/24" ],
+                "destinationAddresses": [ "10.0.3.0/24" ],
+                "destinationPorts": [ "1433" ]
+              }
+            ]
+          },
+          {
+            "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+            "name": "app-rules",
+            "priority": 200,
+            "action": { "type": "Allow" },
+            "rules": [
+              {
+                "ruleType": "ApplicationRule",
+                "name": "allow-microsoft-updates",
+                "sourceAddresses": [ "10.0.0.0/8" ],
+                "protocols": [
+                  { "protocolType": "Https", "port": 443 },
+                  { "protocolType": "Http",  "port": 80  }
+                ],
+                "targetFqdns": [ "*.microsoft.com", "*.windows.com", "*.azure.com" ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/azureFirewalls",
+      "apiVersion": "2023-09-01",
+      "name": "afw-hub",
+      "location": "[parameters('location')]",
+      "tags": { "lab": "azure-networking-labs", "module": "05-azure-firewall" },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'AzureFirewallSubnet')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-afw-hub')]",
+        "[resourceId('Microsoft.Network/firewallPolicies/ruleCollectionGroups', 'afwp-hub', 'lab-rules')]"
+      ],
+      "properties": {
+        "sku": { "name": "AZFW_VNet", "tier": "Standard" },
+        "firewallPolicy": { "id": "[resourceId('Microsoft.Network/firewallPolicies', 'afwp-hub')]" },
+        "ipConfigurations": [
+          {
+            "name": "fw-ipconfig",
+            "properties": {
+              "subnet": { "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-hub', 'AzureFirewallSubnet')]" },
+              "publicIPAddress": { "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-afw-hub')]" }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "firewallId": { "type": "string", "value": "[resourceId('Microsoft.Network/azureFirewalls', 'afw-hub')]" }
+  }
+}
