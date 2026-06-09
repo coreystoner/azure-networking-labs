@@ -1,0 +1,110 @@
+# Module 03: VNet Peering
+
+## Learning Objectives
+
+- Describe hub-and-spoke VNet topology and its benefits
+- Create a spoke VNet and establish bidirectional peering
+- Explain why peering requires two peering resources (one per direction)
+- Understand peering states (Initiated → Connected)
+- Identify traffic flow limitations of basic peering (no transitivity)
+
+---
+
+## Background: Key Concepts
+
+### VNet Peering
+
+VNet peering connects two Azure VNets so resources in each can communicate using private IP addresses — as if they were on the same network. Traffic flows over the Microsoft backbone (not the public internet) and has low latency.
+
+### Why Two Peering Resources?
+
+Peering is **not automatic in both directions**. You must create:
+1. A peering from Hub → Spoke (on the hub VNet)
+2. A peering from Spoke → Hub (on the spoke VNet)
+
+Both must be in **Connected** state before traffic flows.
+
+### Hub-and-Spoke Topology
+
+```
+         [Internet]
+              |
+         [vnet-hub]        ← shared services, firewall, gateway
+        /     |     \
+[spoke1] [spoke2] [spoke3]  ← workload VNets
+```
+
+- The **hub** hosts shared services (Azure Firewall, VPN Gateway, DNS)
+- Each **spoke** is a separate VNet for an application or team
+- Spokes communicate with each other **via the hub** (no direct spoke-to-spoke peering needed)
+
+### Peering Limitations
+
+- Peering is **non-transitive** by default: Spoke1 cannot reach Spoke2 through the hub without extra routing
+- Address spaces of peered VNets **cannot overlap**
+- Peering works within a region (local) or across regions (global peering — slightly higher cost)
+
+---
+
+## Prerequisites
+
+- Module 01 completed (hub VNet deployed)
+
+---
+
+## Deploy the Module
+
+```powershell
+cd modules/03-peering
+
+az deployment group create \
+  --resource-group rg-azure-networking-labs \
+  --template-file deploy.bicep
+```
+
+---
+
+## What Was Deployed
+
+| Resource | Details |
+|----------|--------|
+| `vnet-spoke1` | New spoke VNet, address space `10.1.0.0/16` |
+| `snet-workloads` | Subnet in spoke1, `10.1.1.0/24` |
+| `peer-hub-to-spoke1` | Peering from hub → spoke1 |
+| `peer-spoke1-to-hub` | Peering from spoke1 → hub |
+
+---
+
+## Explore
+
+```powershell
+# Check peering status on the hub VNet
+az network vnet peering list \
+  --resource-group rg-azure-networking-labs \
+  --vnet-name vnet-hub \
+  --output table
+
+# Check peering status on the spoke VNet
+az network vnet peering list \
+  --resource-group rg-azure-networking-labs \
+  --vnet-name vnet-spoke1 \
+  --output table
+```
+
+Both peerings should show **Connected** in the `peeringState` column.
+
+**Think about it:** If you add a second spoke (`vnet-spoke2`) and want spoke1 to communicate with spoke2 via the hub, what configuration would be needed on the hub-side peerings? (Hint: look at `allowForwardedTraffic` and `allowGatewayTransit`.)
+
+---
+
+## Validate
+
+```powershell
+.\validate.ps1
+```
+
+---
+
+## Next Up
+
+**Module 04: Routing & UDRs** — Take control of how traffic flows through your VNets with custom route tables.
