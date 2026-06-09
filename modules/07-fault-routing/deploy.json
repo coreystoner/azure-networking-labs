@@ -2,6 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "rg-azure-networking-labs",
+      "metadata": { "description": "Name of the resource group to deploy into. Use the default unless you have a specific reason to change it." }
+    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -23,6 +28,7 @@
         "lab": "azure-networking-labs",
         "module": "07-fault-routing",
         "fault": "blackhole-route",
+        "resourceGroup": "[parameters('resourceGroupName')]",
         "sessionKey": "[take(toUpper(parameters('sessionKey')), 8)]"
       },
       "properties": {
@@ -50,6 +56,7 @@
     }
   ],
   "outputs": {
-    "rtFaultId": { "type": "string", "value": "[resourceId('Microsoft.Network/routeTables', 'rt-web-fault')]" }
+    "rtFaultId": { "type": "string", "value": "[resourceId('Microsoft.Network/routeTables', 'rt-web-fault')]" },
+    "resourceGroupUsed": { "type": "string", "value": "[resourceGroup().name]" }
   }
 }
