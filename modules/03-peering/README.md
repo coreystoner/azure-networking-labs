@@ -35,6 +35,7 @@ Peering is **not automatic in both directions**. You must create one peering on 
 ## Prerequisites
 
 - Module 01 completed (hub VNet deployed)
+- Azure CLI installed and logged in — [CLI Setup Guide →](../../SETUP.md)
 
 ---
 
@@ -74,8 +75,8 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 ## Explore
 
 ```powershell
-az network vnet peering list \
-  --resource-group rg-azure-networking-labs \
+az network vnet peering list `
+  --resource-group rg-azure-networking-labs `
   --vnet-name vnet-hub --output table
 ```
 
@@ -83,11 +84,23 @@ az network vnet peering list \
 
 ---
 
-## Validate
+## Validate Your Work
 
-```powershell
-.\validate.ps1
-```
+> **First time?** [CLI Setup Guide →](../../SETUP.md)
+
+1. Navigate to this module folder:
+
+   ```powershell
+   cd path\to\azure-networking-labs\modules\03-peering
+   ```
+
+2. Run the validation script:
+
+   ```powershell
+   .\validate.ps1
+   ```
+
+3. Copy the unlock code from the output and enter it in the **learning portal**.
 
 ---
 

@@ -45,8 +45,8 @@ This separation makes it easy to apply different NSG rules (Module 02) to each t
 
 ## Prerequisites
 
-- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed
-- An Azure subscription
+- An Azure subscription (free trial works)
+- Azure CLI installed and logged in — **[See the CLI Setup Guide](../../SETUP.md)** if you haven't done this yet
 
 ---
 
@@ -56,7 +56,7 @@ This separation makes it easy to apply different NSG rules (Module 02) to each t
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"/></a>
 
-You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
+You'll be taken to the Azure portal — select your subscription, set the resource group to `rg-azure-networking-labs`, then click **Review + Create**.
 
 ### ⚡ Option B — Automated Script (Easiest for CLI)
 
@@ -94,8 +94,8 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 ## Explore
 
 ```powershell
-az network vnet subnet list \
-  --resource-group rg-azure-networking-labs \
+az network vnet subnet list `
+  --resource-group rg-azure-networking-labs `
   --vnet-name vnet-hub --output table
 ```
 
@@ -103,13 +103,44 @@ az network vnet subnet list \
 
 ---
 
-## Validate
+## Validate Your Work
 
-```powershell
-.\validate.ps1
-```
+> **First time?** Make sure Azure CLI is installed and you're logged in. [CLI Setup Guide →](../../SETUP.md)
 
-If all checks pass, the script will output your **unlock code**. Copy it and enter it in the learning portal to complete this module.
+### Steps
+
+1. Open PowerShell and navigate to this module folder:
+
+   ```powershell
+   cd path\to\azure-networking-labs\modules\01-vnets-subnets
+   ```
+
+2. *(Windows only — one-time fix if you get a script error)*
+
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+3. Run the validation script:
+
+   ```powershell
+   .\validate.ps1
+   ```
+
+4. On success you'll see your unlock code:
+
+   ```
+   +---------------------------------------+
+   |  ANL-MOD01-VNETS-COMPLETE             |
+   +---------------------------------------+
+   ```
+
+5. Copy the code and enter it in the **learning portal** to unlock Module 02.
+
+> **Tip:** If you used a different resource group name, pass it as a parameter:
+> ```powershell
+> .\validate.ps1 -ResourceGroupName my-custom-rg
+> ```
 
 ---
 

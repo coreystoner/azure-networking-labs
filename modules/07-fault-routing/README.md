@@ -14,8 +14,8 @@ Your job: **identify why internet traffic isn't flowing and fix it.**
 <summary>💡 Hint 1 — Where to look</summary>
 
 ```powershell
-az network route-table route list \
-  --resource-group rg-azure-networking-labs \
+az network route-table route list `
+  --resource-group rg-azure-networking-labs `
   --route-table-name rt-web-fault --output table
 ```
 
@@ -32,10 +32,10 @@ A `nextHopType` of **`None`** is a **blackhole** — traffic is silently dropped
 <summary>💡 Hint 3 — The fix</summary>
 
 ```powershell
-az network route-table route update \
-  --resource-group rg-azure-networking-labs \
-  --route-table-name rt-web-fault \
-  --name route-to-internet \
+az network route-table route update `
+  --resource-group rg-azure-networking-labs `
+  --route-table-name rt-web-fault `
+  --name route-to-internet `
   --next-hop-type Internet
 ```
 
@@ -73,11 +73,23 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 
 ---
 
-## Validate
+## Validate Your Work
 
-```powershell
-.\validate.ps1
-```
+> **First time?** [CLI Setup Guide →](../../SETUP.md)
+
+1. Navigate to this module folder:
+
+   ```powershell
+   cd path\to\azure-networking-labs\modules\07-fault-routing
+   ```
+
+2. Run the validation script:
+
+   ```powershell
+   .\validate.ps1
+   ```
+
+3. Copy the unlock code from the output and enter it in the **learning portal**.
 
 ---
 

@@ -16,8 +16,8 @@ Your job: **find the misconfiguration and fix it.**
 Check the NSG attached to `snet-web-fault`. List all the security rules, including priorities.
 
 ```powershell
-az network nsg rule list \
-  --resource-group rg-azure-networking-labs \
+az network nsg rule list `
+  --resource-group rg-azure-networking-labs `
   --nsg-name nsg-web-fault --output table
 ```
 
@@ -38,10 +38,10 @@ Is there a Deny rule with a lower priority number than your Allow-HTTP rule?
 There is a `Block-All-Inbound` rule at priority **90** — it is evaluated before the `Allow-HTTP-Inbound` rule at priority 100.
 
 ```powershell
-az network nsg rule update \
-  --resource-group rg-azure-networking-labs \
-  --nsg-name nsg-web-fault \
-  --name Block-All-Inbound \
+az network nsg rule update `
+  --resource-group rg-azure-networking-labs `
+  --nsg-name nsg-web-fault `
+  --name Block-All-Inbound `
   --priority 4000
 ```
 
@@ -79,11 +79,23 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 
 ---
 
-## Validate
+## Validate Your Work
 
-```powershell
-.\validate.ps1
-```
+> **First time?** [CLI Setup Guide →](../../SETUP.md)
+
+1. Navigate to this module folder:
+
+   ```powershell
+   cd path\to\azure-networking-labs\modules\06-fault-nsg
+   ```
+
+2. Run the validation script:
+
+   ```powershell
+   .\validate.ps1
+   ```
+
+3. Copy the unlock code from the output and enter it in the **learning portal**.
 
 ---
 

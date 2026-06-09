@@ -27,6 +27,7 @@
 ## Prerequisites
 
 - Module 01 completed (hub VNet deployed)
+- Azure CLI installed and logged in — [CLI Setup Guide →](../../SETUP.md)
 
 ---
 
@@ -65,8 +66,8 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 ## Explore
 
 ```powershell
-az network route-table route list \
-  --resource-group rg-azure-networking-labs \
+az network route-table route list `
+  --resource-group rg-azure-networking-labs `
   --route-table-name rt-web --output table
 ```
 
@@ -74,11 +75,23 @@ az network route-table route list \
 
 ---
 
-## Validate
+## Validate Your Work
 
-```powershell
-.\validate.ps1
-```
+> **First time?** [CLI Setup Guide →](../../SETUP.md)
+
+1. Navigate to this module folder:
+
+   ```powershell
+   cd path\to\azure-networking-labs\modules\04-routing-udrs
+   ```
+
+2. Run the validation script:
+
+   ```powershell
+   .\validate.ps1
+   ```
+
+3. Copy the unlock code from the output and enter it in the **learning portal**.
 
 ---
 

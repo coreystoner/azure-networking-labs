@@ -35,6 +35,7 @@ Evaluation order: DNAT → Network → Application. First match wins.
 
 - Module 01 completed (hub VNet with `10.0.0.0/16`)
 - Budget/credits available (~$1.50/hr)
+- Azure CLI installed and logged in — [CLI Setup Guide →](../../SETUP.md)
 
 ---
 
@@ -73,11 +74,23 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 
 ---
 
-## Validate
+## Validate Your Work
 
-```powershell
-.\validate.ps1
-```
+> **First time?** [CLI Setup Guide →](../../SETUP.md)
+
+1. Navigate to this module folder:
+
+   ```powershell
+   cd path\to\azure-networking-labs\modules\05-azure-firewall
+   ```
+
+2. Run the validation script:
+
+   ```powershell
+   .\validate.ps1
+   ```
+
+3. Copy the unlock code from the output and enter it in the **learning portal**.
 
 ## ⚠️ Clean Up Immediately After Validating
 

@@ -38,6 +38,7 @@ A Network Security Group is a layer-4 firewall (TCP/UDP, IP) attached to a subne
 ## Prerequisites
 
 - Module 01 completed (hub VNet with three subnets deployed)
+- Azure CLI installed and logged in — [CLI Setup Guide →](../../SETUP.md)
 
 ---
 
@@ -76,8 +77,8 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 ## Explore
 
 ```powershell
-az network nsg rule list \
-  --resource-group rg-azure-networking-labs \
+az network nsg rule list `
+  --resource-group rg-azure-networking-labs `
   --nsg-name nsg-web --include-default --output table
 ```
 
@@ -85,11 +86,25 @@ az network nsg rule list \
 
 ---
 
-## Validate
+## Validate Your Work
 
-```powershell
-.\validate.ps1
-```
+> **First time?** [CLI Setup Guide →](../../SETUP.md)
+
+1. Navigate to this module folder:
+
+   ```powershell
+   cd path\to\azure-networking-labs\modules\02-nsgs
+   ```
+
+2. Run the validation script:
+
+   ```powershell
+   .\validate.ps1
+   ```
+
+3. Copy the unlock code from the output and enter it in the **learning portal**.
+
+> **Custom resource group?** `.\.validate.ps1 -ResourceGroupName my-custom-rg`
 
 ---
 
