@@ -1,5 +1,7 @@
 # Module 07: Fault Lab — Routing
 
+[![Deploy to Azure](https://aka.ms/deploytoazure)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F07-fault-routing%2Fdeploy.bicep)
+
 ## Scenario
 
 A VM in the `snet-web` subnet has lost internet connectivity. The networking team insists the route table is configured correctly with a route to the internet. You've been asked to investigate.
@@ -12,8 +14,6 @@ Your job: **identify why internet traffic isn't flowing and fix it.**
 
 <details>
 <summary>💡 Hint 1 — Where to look</summary>
-
-Check the routes in the route table associated with `snet-web-fault2`:
 
 ```powershell
 az network route-table route list \
@@ -28,15 +28,13 @@ Pay attention to the `nextHopType` column for the `0.0.0.0/0` route.
 <details>
 <summary>💡 Hint 2 — What to look for</summary>
 
-A route to `0.0.0.0/0` (all internet traffic) with `nextHopType` of **`None`** is a **blackhole**. Traffic matching this route is silently dropped.
+A `nextHopType` of **`None`** is a **blackhole** — traffic is silently dropped.
 
-For internet connectivity, the next-hop type should be `Internet` (or `VirtualAppliance` if routing through a firewall).
+For internet connectivity it should be `Internet` (or `VirtualAppliance` if routing through a firewall).
 </details>
 
 <details>
 <summary>💡 Hint 3 — The fix</summary>
-
-Update the `route-to-internet` route to use `Internet` as the next hop:
 
 ```powershell
 az network route-table route update \
@@ -50,20 +48,22 @@ az network route-table route update \
 
 ---
 
-## Prerequisites
+## Deploy Options
 
-- Module 01 completed (hub VNet deployed)
+### 🚀 Option A — One-click (Deploy to Azure)
 
----
+Click the badge at the top of this page.
 
-## Deploy the Broken Environment
+### ⚡ Option B — Automated Script
 
 ```powershell
-cd modules/07-fault-routing
+.\Start-Module.ps1
+```
 
-az deployment group create \
-  --resource-group rg-azure-networking-labs \
-  --template-file deploy.bicep
+### 🔧 Option C — Manual
+
+```powershell
+az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
 ```
 
 ---
@@ -84,9 +84,9 @@ az deployment group create \
 
 ---
 
-## What's Next?
+## Congratulations! 🎉
 
-Congratulations — you've completed all seven modules! 🎉
+You've completed all seven modules!
 
 **Suggested next topics:**
 - Azure VPN Gateway (site-to-site and point-to-site)

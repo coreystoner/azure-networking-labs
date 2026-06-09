@@ -1,5 +1,7 @@
 # Module 01: VNets & Subnets
 
+[![Deploy to Azure](https://aka.ms/deploytoazure)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.bicep)
+
 ## Learning Objectives
 
 By the end of this module you will be able to:
@@ -45,31 +47,40 @@ This separation makes it easy to apply different NSG rules (Module 02) to each t
 
 ## Prerequisites
 
-- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed and logged in
-- A resource group created: `rg-azure-networking-labs`
-
-```powershell
-# Log in (if you haven't already)
-az login
-az account set --subscription "YOUR_SUBSCRIPTION_NAME_OR_ID"
-
-# Create the shared resource group
-az group create --name rg-azure-networking-labs --location eastus
-```
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed
+- An Azure subscription
 
 ---
 
-## Deploy the Module
+## Deploy Options
+
+### 🚀 Option A — One-click (Deploy to Azure)
+
+Click the badge at the top of this page. You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
+
+### ⚡ Option B — Automated Script (Easiest for CLI)
 
 ```powershell
-cd modules/01-vnets-subnets
+# From the module folder:
+.\Start-Module.ps1
 
-az deployment group create \
-  --resource-group rg-azure-networking-labs \
-  --template-file deploy.bicep
+# Or from the repo root:
+.\Start-Lab.ps1 -Module 01
 ```
 
-The deployment takes about 30 seconds. When complete, you'll see output showing the VNet name, ID, and subnet IDs.
+This handles login, resource group creation, deployment, and offers to run validation automatically.
+
+### 🔧 Option C — Manual
+
+```powershell
+# First-time setup
+az login
+az group create --name rg-azure-networking-labs --location eastus
+
+# Deploy
+cd modules/01-vnets-subnets
+az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
+```
 
 ---
 
@@ -112,8 +123,6 @@ az network vnet subnet show \
 ---
 
 ## Validate
-
-Run the validation script to check your deployment:
 
 ```powershell
 .\validate.ps1

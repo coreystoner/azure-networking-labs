@@ -1,5 +1,7 @@
 # Module 06: Fault Lab — NSG
 
+[![Deploy to Azure](https://aka.ms/deploytoazure)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F06-fault-nsg%2Fdeploy.bicep)
+
 ## Scenario
 
 Your team has deployed a web application in a new subnet. The NSG team claims they've added an inbound rule to allow HTTP traffic (port 80) from the internet. However, **no HTTP traffic is getting through**.
@@ -36,9 +38,7 @@ Is there a Deny rule with a lower priority number than your Allow-HTTP rule?
 <details>
 <summary>💡 Hint 3 — The fix</summary>
 
-There is a `Block-All-Inbound` rule at priority **90** — it is evaluated before the `Allow-HTTP-Inbound` rule at priority 100, blocking all traffic.
-
-Fix: Change the `Block-All-Inbound` rule priority to **4000** (evaluated last, as a catch-all deny):
+There is a `Block-All-Inbound` rule at priority **90** — it is evaluated before the `Allow-HTTP-Inbound` rule at priority 100.
 
 ```powershell
 az network nsg rule update \
@@ -52,20 +52,22 @@ az network nsg rule update \
 
 ---
 
-## Prerequisites
+## Deploy Options
 
-- Module 01 completed (hub VNet deployed)
+### 🚀 Option A — One-click (Deploy to Azure)
 
----
+Click the badge at the top of this page.
 
-## Deploy the Broken Environment
+### ⚡ Option B — Automated Script
 
 ```powershell
-cd modules/06-fault-nsg
+.\Start-Module.ps1
+```
 
-az deployment group create \
-  --resource-group rg-azure-networking-labs \
-  --template-file deploy.bicep
+### 🔧 Option C — Manual
+
+```powershell
+az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
 ```
 
 ---
@@ -74,7 +76,7 @@ az deployment group create \
 
 1. Identify why HTTP traffic is blocked despite the allow rule
 2. Fix the misconfiguration using `az network nsg rule update`
-3. Run `validate.ps1` to confirm your fix is correct
+3. Run `validate.ps1` to confirm your fix
 
 ---
 

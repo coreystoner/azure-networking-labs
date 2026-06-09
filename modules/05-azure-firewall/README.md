@@ -1,5 +1,15 @@
 # Module 05: Azure Firewall
 
+[![Deploy to Azure](https://aka.ms/deploytoazure)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F05-azure-firewall%2Fdeploy.bicep)
+
+## ⚠️ Cost Warning
+
+**Azure Firewall costs approximately $1.25–$1.50/hr.** Run `cleanup.ps1 -ModuleOnly` immediately after completing validation.
+
+See [cost-estimate.md](./cost-estimate.md) for the full breakdown.
+
+---
+
 ## Learning Objectives
 
 - Deploy Azure Firewall in the hub VNet
@@ -10,14 +20,6 @@
 
 ---
 
-## ⚠️ Cost Warning
-
-**Azure Firewall costs approximately $1.25–$1.50/hr** depending on SKU. This is the most expensive module in the series. **Run `cleanup.ps1` as soon as you complete validation** to avoid unnecessary charges.
-
-See [cost-estimate.md](./cost-estimate.md) for the full breakdown.
-
----
-
 ## Background: Key Concepts
 
 ### Azure Firewall Architecture
@@ -25,46 +27,46 @@ See [cost-estimate.md](./cost-estimate.md) for the full breakdown.
 Azure Firewall is a cloud-native, stateful firewall-as-a-service. It:
 - Deploys into a dedicated `AzureFirewallSubnet` (/26 minimum) in your hub VNet
 - Has a public IP for internet-facing traffic
-- Processes all traffic that UDRs direct to it
 - Supports FQDN-based application rules (not just IP/port)
 
 ### Rule Types
 
 | Rule Type | Layer | Example Use Case |
 |-----------|-------|------------------|
-| **Network rules** | L3/L4 (IP, port, protocol) | Allow SQL (1433) from app tier to data tier |
-| **Application rules** | L7 (FQDN, protocol) | Allow `*.microsoft.com` HTTPS outbound |
+| **Network rules** | L3/L4 | Allow SQL (1433) from app tier to data tier |
+| **Application rules** | L7 (FQDN) | Allow `*.microsoft.com` HTTPS outbound |
 | **DNAT rules** | Inbound NAT | Expose a VM RDP behind a public IP |
 
-Rules are evaluated: DNAT → Network → Application. First match wins.
-
-### Firewall Policy vs Classic Rules
-
-- **Firewall Policy** (recommended): A separate resource that can be shared across multiple firewalls; supports rule hierarchies
-- **Classic rules**: Directly on the firewall resource; simpler but less flexible
-
-This module uses **Firewall Policy**.
+Evaluation order: DNAT → Network → Application. First match wins.
 
 ---
 
 ## Prerequisites
 
-- Module 01 completed (hub VNet with `10.0.0.0/16` address space)
-- **Ensure you have budget/credits available** — this module costs ~$1.50/hr
+- Module 01 completed (hub VNet with `10.0.0.0/16`)
+- Budget/credits available (~$1.50/hr)
 
 ---
 
-## Deploy the Module
+## Deploy Options
+
+### 🚀 Option A — One-click (Deploy to Azure)
+
+Click the badge at the top of this page. Deployment takes **5–10 minutes**.
+
+### ⚡ Option B — Automated Script
 
 ```powershell
-cd modules/05-azure-firewall
-
-az deployment group create \
-  --resource-group rg-azure-networking-labs \
-  --template-file deploy.bicep
+.\Start-Module.ps1
 ```
 
-> The deployment takes approximately **5–10 minutes** (Azure Firewall provisions slowly).
+The script shows the cost warning and asks for confirmation before proceeding.
+
+### 🔧 Option C — Manual
+
+```powershell
+az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
+```
 
 ---
 
@@ -82,28 +84,11 @@ az deployment group create \
 ## Explore
 
 ```powershell
-# View the firewall private IP (should be 10.0.4.4)
+# Verify private IP is 10.0.4.4
 az network firewall show \
   --resource-group rg-azure-networking-labs \
   --name afw-hub \
   --query 'ipConfigurations[0].privateIPAddress'
-
-# List application rules in the policy
-az network firewall policy rule-collection-group list \
-  --resource-group rg-azure-networking-labs \
-  --policy-name afwp-hub
-```
-
-**Think about it:** The UDRs from Module 04 point to `10.0.4.4`. With the firewall now deployed, what would happen to a VM in `snet-web` trying to reach `www.microsoft.com`? Which firewall rule would it match?
-
----
-
-## ⚠️ Clean Up Immediately
-
-After validating, delete the firewall:
-
-```powershell
-.\cleanup.ps1 -ModuleOnly
 ```
 
 ---
@@ -112,6 +97,12 @@ After validating, delete the firewall:
 
 ```powershell
 .\validate.ps1
+```
+
+## ⚠️ Clean Up Immediately After Validating
+
+```powershell
+.\cleanup.ps1 -ModuleOnly
 ```
 
 ---

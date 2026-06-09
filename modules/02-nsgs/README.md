@@ -1,5 +1,7 @@
 # Module 02: Network Security Groups
 
+[![Deploy to Azure](https://aka.ms/deploytoazure)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F02-nsgs%2Fdeploy.bicep)
+
 ## Learning Objectives
 
 - Explain how NSG rules are evaluated (priority order, stateful matching)
@@ -50,14 +52,22 @@ Every NSG contains these at the bottom (high priority numbers, evaluated last):
 
 ---
 
-## Deploy the Module
+## Deploy Options
+
+### 🚀 Option A — One-click (Deploy to Azure)
+
+Click the badge at the top of this page.
+
+### ⚡ Option B — Automated Script
 
 ```powershell
-cd modules/02-nsgs
+.\Start-Module.ps1
+```
 
-az deployment group create \
-  --resource-group rg-azure-networking-labs \
-  --template-file deploy.bicep
+### 🔧 Option C — Manual
+
+```powershell
+az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
 ```
 
 ---
@@ -70,20 +80,13 @@ az deployment group create \
 | `nsg-app` | `snet-app` | Allow traffic from `snet-web` only (10.0.1.0/24) |
 | `nsg-data` | `snet-data` | Allow traffic from `snet-app` only (10.0.2.0/24) |
 
-This creates a **tiered security model**: the internet can only reach the web tier, the web tier can only reach the app tier, and the app tier can only reach the data tier. Each tier is isolated from the others except through defined rules.
+This creates a **tiered security model**: the internet can only reach the web tier, the web tier can only reach the app tier, and the app tier can only reach the data tier.
 
 ---
 
 ## Explore
 
 ```powershell
-# View effective security rules on snet-web
-az network vnet subnet show \
-  --resource-group rg-azure-networking-labs \
-  --vnet-name vnet-hub \
-  --name snet-web \
-  --query networkSecurityGroup
-
 # List all rules on nsg-web (including default rules)
 az network nsg rule list \
   --resource-group rg-azure-networking-labs \

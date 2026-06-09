@@ -1,5 +1,7 @@
 # Module 03: VNet Peering
 
+[![Deploy to Azure](https://aka.ms/deploytoazure)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F03-peering%2Fdeploy.bicep)
+
 ## Learning Objectives
 
 - Describe hub-and-spoke VNet topology and its benefits
@@ -34,15 +36,11 @@ Both must be in **Connected** state before traffic flows.
 [spoke1] [spoke2] [spoke3]  ← workload VNets
 ```
 
-- The **hub** hosts shared services (Azure Firewall, VPN Gateway, DNS)
-- Each **spoke** is a separate VNet for an application or team
-- Spokes communicate with each other **via the hub** (no direct spoke-to-spoke peering needed)
-
 ### Peering Limitations
 
-- Peering is **non-transitive** by default: Spoke1 cannot reach Spoke2 through the hub without extra routing
+- Peering is **non-transitive** by default
 - Address spaces of peered VNets **cannot overlap**
-- Peering works within a region (local) or across regions (global peering — slightly higher cost)
+- Global peering (cross-region) incurs small data transfer costs
 
 ---
 
@@ -52,14 +50,22 @@ Both must be in **Connected** state before traffic flows.
 
 ---
 
-## Deploy the Module
+## Deploy Options
+
+### 🚀 Option A — One-click (Deploy to Azure)
+
+Click the badge at the top of this page.
+
+### ⚡ Option B — Automated Script
 
 ```powershell
-cd modules/03-peering
+.\Start-Module.ps1
+```
 
-az deployment group create \
-  --resource-group rg-azure-networking-labs \
-  --template-file deploy.bicep
+### 🔧 Option C — Manual
+
+```powershell
+az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
 ```
 
 ---
@@ -67,7 +73,7 @@ az deployment group create \
 ## What Was Deployed
 
 | Resource | Details |
-|----------|--------|
+|----------|---------|
 | `vnet-spoke1` | New spoke VNet, address space `10.1.0.0/16` |
 | `snet-workloads` | Subnet in spoke1, `10.1.1.0/24` |
 | `peer-hub-to-spoke1` | Peering from hub → spoke1 |
@@ -78,22 +84,17 @@ az deployment group create \
 ## Explore
 
 ```powershell
-# Check peering status on the hub VNet
+# Check peering status — both should show 'Connected'
 az network vnet peering list \
   --resource-group rg-azure-networking-labs \
-  --vnet-name vnet-hub \
-  --output table
+  --vnet-name vnet-hub --output table
 
-# Check peering status on the spoke VNet
 az network vnet peering list \
   --resource-group rg-azure-networking-labs \
-  --vnet-name vnet-spoke1 \
-  --output table
+  --vnet-name vnet-spoke1 --output table
 ```
 
-Both peerings should show **Connected** in the `peeringState` column.
-
-**Think about it:** If you add a second spoke (`vnet-spoke2`) and want spoke1 to communicate with spoke2 via the hub, what configuration would be needed on the hub-side peerings? (Hint: look at `allowForwardedTraffic` and `allowGatewayTransit`.)
+**Think about it:** If you add `vnet-spoke2`, what's needed for spoke1 to reach spoke2 via the hub? (Hint: `allowForwardedTraffic`.)
 
 ---
 
