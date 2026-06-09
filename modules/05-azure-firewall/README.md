@@ -13,19 +13,11 @@ See [cost-estimate.md](./cost-estimate.md) for the full breakdown.
 - Deploy Azure Firewall in the hub VNet
 - Create a Firewall Policy with network rules, application rules, and DNAT rules
 - Understand the difference between Classic rules and Firewall Policy
-- Route traffic through the firewall using UDRs (from Module 04)
 - Explain the role of `AzureFirewallSubnet` and its size requirement
 
 ---
 
 ## Background: Key Concepts
-
-### Azure Firewall Architecture
-
-Azure Firewall is a cloud-native, stateful firewall-as-a-service. It:
-- Deploys into a dedicated `AzureFirewallSubnet` (/26 minimum) in your hub VNet
-- Has a public IP for internet-facing traffic
-- Supports FQDN-based application rules (not just IP/port)
 
 ### Rule Types
 
@@ -50,7 +42,7 @@ Evaluation order: DNAT → Network → Application. First match wins.
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F05-azure-firewall%2Fdeploy.json)
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F05-azure-firewall%2Fdeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"/></a>
 
 Deployment takes **5–10 minutes**. You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
@@ -78,18 +70,6 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 | `pip-afw-hub` | Public IP for the firewall |
 | `afwp-hub` | Firewall Policy with example rules |
 | `afw-hub` | Azure Firewall (Standard SKU) at `10.0.4.4` |
-
----
-
-## Explore
-
-```powershell
-# Verify private IP is 10.0.4.4
-az network firewall show \
-  --resource-group rg-azure-networking-labs \
-  --name afw-hub \
-  --query 'ipConfigurations[0].privateIPAddress'
-```
 
 ---
 

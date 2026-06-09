@@ -54,7 +54,7 @@ This separation makes it easy to apply different NSG rules (Module 02) to each t
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.json)
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"/></a>
 
 You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
@@ -73,11 +73,8 @@ This handles login, resource group creation, deployment, and offers to run valid
 ### 🔧 Option C — Manual
 
 ```powershell
-# First-time setup
 az login
 az group create --name rg-azure-networking-labs --location eastus
-
-# Deploy
 az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
 ```
 
@@ -92,32 +89,17 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 | Subnet (app) | `snet-app` | `10.0.2.0/24` |
 | Subnet (data) | `snet-data` | `10.0.3.0/24` |
 
-Notice we're using the `10.0.x.x` private range and leaving plenty of address space:
-- `10.0.0.0/24` is intentionally skipped (reserved for future management/gateway subnets)
-- `10.0.4.0/24` onward is available for future modules (firewall, etc.)
-
 ---
 
 ## Explore
 
-Before validating, explore what was deployed:
-
 ```powershell
-# List all subnets
 az network vnet subnet list \
   --resource-group rg-azure-networking-labs \
-  --vnet-name vnet-hub \
-  --output table
-
-# Check how many usable IPs are in snet-web
-az network vnet subnet show \
-  --resource-group rg-azure-networking-labs \
-  --vnet-name vnet-hub \
-  --name snet-web \
-  --query '{name:name, prefix:addressPrefix, availableIPs:ipConfigurations}'
+  --vnet-name vnet-hub --output table
 ```
 
-**Think about it:** If you needed a fourth subnet for a management jumpbox and wanted to keep it small, what CIDR block would you use from the remaining `10.0.0.0/16` space?
+**Think about it:** If you needed a fourth subnet for a management jumpbox, what CIDR block would you use from the remaining `10.0.0.0/16` space?
 
 ---
 
@@ -132,8 +114,6 @@ If all checks pass, the script will output your **unlock code**. Copy it and ent
 ---
 
 ## Cleanup
-
-This module uses no billed resources. You can leave it deployed for Module 02, or clean up:
 
 ```powershell
 .\cleanup.ps1

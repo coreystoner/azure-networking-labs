@@ -2,7 +2,7 @@
 
 ## Scenario
 
-A VM in the `snet-web` subnet has lost internet connectivity. The networking team insists the route table is configured correctly with a route to the internet. You've been asked to investigate.
+A VM in the `snet-web` subnet has lost internet connectivity. The networking team insists the route table is configured correctly. You've been asked to investigate.
 
 Your job: **identify why internet traffic isn't flowing and fix it.**
 
@@ -16,8 +16,7 @@ Your job: **identify why internet traffic isn't flowing and fix it.**
 ```powershell
 az network route-table route list \
   --resource-group rg-azure-networking-labs \
-  --route-table-name rt-web-fault \
-  --output table
+  --route-table-name rt-web-fault --output table
 ```
 
 Pay attention to the `nextHopType` column for the `0.0.0.0/0` route.
@@ -26,9 +25,7 @@ Pay attention to the `nextHopType` column for the `0.0.0.0/0` route.
 <details>
 <summary>💡 Hint 2 — What to look for</summary>
 
-A `nextHopType` of **`None`** is a **blackhole** — traffic is silently dropped.
-
-For internet connectivity it should be `Internet` (or `VirtualAppliance` if routing through a firewall).
+A `nextHopType` of **`None`** is a **blackhole** — traffic is silently dropped. For internet connectivity it should be `Internet`.
 </details>
 
 <details>
@@ -50,7 +47,7 @@ az network route-table route update \
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F07-fault-routing%2Fdeploy.json)
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F07-fault-routing%2Fdeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"/></a>
 
 You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 

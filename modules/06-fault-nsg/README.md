@@ -18,8 +18,7 @@ Check the NSG attached to `snet-web-fault`. List all the security rules, includi
 ```powershell
 az network nsg rule list \
   --resource-group rg-azure-networking-labs \
-  --nsg-name nsg-web-fault \
-  --output table
+  --nsg-name nsg-web-fault --output table
 ```
 
 Pay close attention to the **priority numbers**.
@@ -54,7 +53,7 @@ az network nsg rule update \
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F06-fault-nsg%2Fdeploy.json)
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F06-fault-nsg%2Fdeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"/></a>
 
 You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 

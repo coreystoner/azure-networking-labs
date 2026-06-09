@@ -7,27 +7,10 @@
 - Explain next-hop types (`Internet`, `VirtualAppliance`, `VnetLocal`, `None`)
 - Associate a route table with a subnet
 - Understand how UDRs override system routes
-- Explain BGP route propagation and when to disable it
 
 ---
 
 ## Background: Key Concepts
-
-### Azure System Routes
-
-| Destination | Next Hop | Notes |
-|-------------|----------|-------|
-| VNet address space | VnetLocal | Traffic stays within the VNet |
-| 0.0.0.0/0 | Internet | All outbound traffic goes to internet |
-| 10.0.0.0/8 | None | RFC 1918 ranges NOT in the VNet are dropped |
-
-### User Defined Routes (UDRs)
-
-UDRs let you **override** system routes. Common uses:
-
-- Force outbound internet traffic through an NVA or Azure Firewall
-- Route cross-VNet traffic through a hub appliance
-- Create a "black hole" route to intentionally drop traffic
 
 ### Next-Hop Types
 
@@ -51,7 +34,7 @@ UDRs let you **override** system routes. Common uses:
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F04-routing-udrs%2Fdeploy.json)
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F04-routing-udrs%2Fdeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure"/></a>
 
 You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
@@ -77,8 +60,6 @@ az deployment group create --resource-group rg-azure-networking-labs --template-
 | `rt-app` | `snet-app` | Route internet traffic to hub appliance |
 | `rt-data` | `snet-data` | Blackhole route — no direct outbound internet |
 
-> **Note:** `10.0.4.4` is a placeholder for the Azure Firewall deployed in Module 05.
-
 ---
 
 ## Explore
@@ -89,7 +70,7 @@ az network route-table route list \
   --route-table-name rt-web --output table
 ```
 
-**Think about it:** The data tier has a `None` next-hop for `0.0.0.0/0`. What happens to a data-tier VM trying to reach the internet? Is this intentional from a security perspective?
+**Think about it:** The data tier has a `None` next-hop for `0.0.0.0/0`. What happens to a data-tier VM trying to reach the internet?
 
 ---
 
