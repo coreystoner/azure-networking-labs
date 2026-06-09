@@ -4,14 +4,6 @@
 // =============================================================================
 //
 // This template adds NSGs to the hub VNet subnets from Module 01.
-// Each subnet tier gets its own NSG with rules appropriate to its function:
-//
-//   snet-web  →  nsg-web   : Allow HTTP/HTTPS from Internet
-//   snet-app  →  nsg-app   : Allow traffic from snet-web only
-//   snet-data →  nsg-data  : Allow traffic from snet-app only
-//
-// This creates a defence-in-depth tiered model where each layer can only
-// communicate with the adjacent tier.
 //
 // Prerequisite: Module 01 (vnet-hub) must be deployed.
 // Cost: $0.00/hr  — NSGs are free in Azure.
@@ -20,19 +12,18 @@
 @description('Azure region. Defaults to resource group location.')
 param location string = resourceGroup().location
 
-// Reference the existing hub VNet from Module 01
+@description('Session key used to generate a unique unlock code. Auto-generated on each deployment.')
+param sessionKey string = newGuid()
+
 resource hubVnet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: 'vnet-hub'
 }
 
-// ---------------------------------------------------------------------------
-// NSG: Web Tier
-// Allow HTTP and HTTPS inbound from the internet.
-// ---------------------------------------------------------------------------
+// nsg-web: primary resource — carries sessionKey tag for validation
 resource nsgWeb 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
   name: 'nsg-web'
   location: location
-  tags: { lab: 'azure-networking-labs', module: '02-nsgs' }
+  tags: { lab: 'azure-networking-labs', module: '02-nsgs', sessionKey: take(toUpper(sessionKey), 8) }
   properties: {
     securityRules: [
       {
@@ -46,7 +37,6 @@ resource nsgWeb 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '80'
-          description: 'Allow HTTP traffic from the internet'
         }
       }
       {
@@ -60,18 +50,12 @@ resource nsgWeb 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '443'
-          description: 'Allow HTTPS traffic from the internet'
         }
       }
     ]
   }
 }
 
-// ---------------------------------------------------------------------------
-// NSG: App Tier
-// Allow traffic only from the web subnet (10.0.1.0/24).
-// Nothing else should reach the app tier directly.
-// ---------------------------------------------------------------------------
 resource nsgApp 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
   name: 'nsg-app'
   location: location
@@ -89,7 +73,6 @@ resource nsgApp 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '*'
-          description: 'Allow all traffic from the web subnet'
         }
       }
       {
@@ -103,17 +86,12 @@ resource nsgApp 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '*'
-          description: 'Explicitly deny everything not whitelisted above'
         }
       }
     ]
   }
 }
 
-// ---------------------------------------------------------------------------
-// NSG: Data Tier
-// Allow traffic only from the app subnet (10.0.2.0/24).
-// ---------------------------------------------------------------------------
 resource nsgData 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
   name: 'nsg-data'
   location: location
@@ -131,7 +109,6 @@ resource nsgData 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '*'
-          description: 'Allow all traffic from the app subnet'
         }
       }
       {
@@ -145,17 +122,12 @@ resource nsgData 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '*'
-          description: 'Explicitly deny everything not whitelisted above'
         }
       }
     ]
   }
 }
 
-// ---------------------------------------------------------------------------
-// Associate NSGs with subnets
-// Using child resource syntax to update existing subnets.
-// ---------------------------------------------------------------------------
 resource subnetWeb 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
   parent: hubVnet
   name: 'snet-web'
@@ -168,7 +140,7 @@ resource subnetWeb 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
 resource subnetApp 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
   parent: hubVnet
   name: 'snet-app'
-  dependsOn: [subnetWeb] // Update subnets sequentially to avoid conflicts
+  dependsOn: [subnetWeb]
   properties: {
     addressPrefix: '10.0.2.0/24'
     networkSecurityGroup: { id: nsgApp.id }
@@ -185,9 +157,6 @@ resource subnetData 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Outputs
-// ---------------------------------------------------------------------------
 output nsgWebId  string = nsgWeb.id
 output nsgAppId  string = nsgApp.id
 output nsgDataId string = nsgData.id

@@ -3,58 +3,36 @@
 // Azure Networking Labs
 // =============================================================================
 //
-// INTENTIONAL MISCONFIGURATION: This template deploys a broken route table.
-//
-// The fault: The route to 0.0.0.0/0 (all internet traffic) has nextHopType
-// 'None', which creates a blackhole. All outbound internet traffic is silently
-// dropped.
-//
-// The fix: Update the route's nextHopType to 'Internet'.
+// INTENTIONAL MISCONFIGURATION: route-to-internet has nextHopType 'None' (blackhole).
+// Fix: Change nextHopType to 'Internet'.
 //
 // =============================================================================
 
 @description('Azure region.')
 param location string = resourceGroup().location
 
+@description('Session key used to generate a unique unlock code. Auto-generated on each deployment.')
+param sessionKey string = newGuid()
+
 resource hubVnet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: 'vnet-hub'
 }
 
-// ---------------------------------------------------------------------------
-// Fault subnet: uses a separate subnet to not conflict with Module 04's routes
-// ---------------------------------------------------------------------------
-resource subnetFault 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
-  parent: hubVnet
-  name: 'snet-web-fault2'
-  properties: {
-    addressPrefix: '10.0.11.0/24'
-    routeTable: { id: rtFault.id }
-  }
-  dependsOn: [rtFault]
-}
-
-// ---------------------------------------------------------------------------
-// Broken Route Table
-//
-// FAULT: route-to-internet has nextHopType 'None'
-//        This creates a blackhole — all internet-bound traffic is dropped.
-//        The correct value is 'Internet'.
-// ---------------------------------------------------------------------------
+// rt-web-fault: primary resource — carries sessionKey tag for validation
 resource rtFault 'Microsoft.Network/routeTables@2023-09-01' = {
   name: 'rt-web-fault'
   location: location
-  tags: { lab: 'azure-networking-labs', module: '07-fault-routing', fault: 'blackhole-route' }
+  tags: { lab: 'azure-networking-labs', module: '07-fault-routing', fault: 'blackhole-route', sessionKey: take(toUpper(sessionKey), 8) }
   properties: {
     routes: [
       {
         name: 'route-to-internet'
         properties: {
           addressPrefix: '0.0.0.0/0'
-          nextHopType: 'None'  // <-- THIS IS THE BUG. Should be 'Internet'.
+          nextHopType: 'None'  // <-- BUG: should be 'Internet'
         }
       }
       {
-        // This route is correct — internal VNet traffic stays local
         name: 'route-vnet-local'
         properties: {
           addressPrefix: '10.0.0.0/16'
@@ -63,6 +41,16 @@ resource rtFault 'Microsoft.Network/routeTables@2023-09-01' = {
       }
     ]
   }
+}
+
+resource subnetFault 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
+  parent: hubVnet
+  name: 'snet-web-fault2'
+  properties: {
+    addressPrefix: '10.0.11.0/24'
+    routeTable: { id: rtFault.id }
+  }
+  dependsOn: [rtFault]
 }
 
 output rtFaultId     string = rtFault.id

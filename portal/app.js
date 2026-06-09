@@ -5,6 +5,9 @@
 
 const REPO_BASE = 'https://github.com/coreystoner/azure-networking-labs/tree/main';
 
+// completionPattern: regex that matches a valid unlock code for each module.
+// Codes are generated at deploy time: ANL-MOD0X-{8-char hex session key}-COMPLETE
+// Example: ANL-MOD01-A1B2C3D4-COMPLETE
 const MODULES = [
   {
     id: 'mod01',
@@ -20,7 +23,7 @@ const MODULES = [
     ],
     cost: '~$0.00/hr',
     costClass: 'cost-free',
-    completionCode: 'ANL-MOD01-VNETS-COMPLETE',
+    completionPattern: /^ANL-MOD01-[A-F0-9]{8}-COMPLETE$/i,
     unlocksId: 'mod02',
     alwaysUnlocked: true,
     path: 'modules/01-vnets-subnets'
@@ -39,7 +42,7 @@ const MODULES = [
     ],
     cost: '~$0.00/hr',
     costClass: 'cost-free',
-    completionCode: 'ANL-MOD02-NSGS-COMPLETE',
+    completionPattern: /^ANL-MOD02-[A-F0-9]{8}-COMPLETE$/i,
     unlocksId: 'mod03',
     unlockedBy: 'mod01',
     path: 'modules/02-nsgs'
@@ -58,7 +61,7 @@ const MODULES = [
     ],
     cost: '~$0.00/hr',
     costClass: 'cost-free',
-    completionCode: 'ANL-MOD03-PEERING-COMPLETE',
+    completionPattern: /^ANL-MOD03-[A-F0-9]{8}-COMPLETE$/i,
     unlocksId: 'mod04',
     unlockedBy: 'mod02',
     path: 'modules/03-peering'
@@ -77,7 +80,7 @@ const MODULES = [
     ],
     cost: '~$0.00/hr',
     costClass: 'cost-free',
-    completionCode: 'ANL-MOD04-ROUTING-COMPLETE',
+    completionPattern: /^ANL-MOD04-[A-F0-9]{8}-COMPLETE$/i,
     unlocksId: 'mod05',
     unlockedBy: 'mod03',
     path: 'modules/04-routing-udrs'
@@ -96,7 +99,7 @@ const MODULES = [
     ],
     cost: '~$1.50/hr',
     costClass: 'cost-medium',
-    completionCode: 'ANL-MOD05-FIREWALL-COMPLETE',
+    completionPattern: /^ANL-MOD05-[A-F0-9]{8}-COMPLETE$/i,
     unlockedBy: 'mod04',
     path: 'modules/05-azure-firewall'
   },
@@ -114,7 +117,7 @@ const MODULES = [
     ],
     cost: '~$0.10/hr',
     costClass: 'cost-low',
-    completionCode: 'ANL-MOD06-FAULT-NSG-COMPLETE',
+    completionPattern: /^ANL-MOD06-[A-F0-9]{8}-COMPLETE$/i,
     unlocksId: 'mod07',
     unlockedBy: 'mod04',
     path: 'modules/06-fault-nsg'
@@ -133,7 +136,7 @@ const MODULES = [
     ],
     cost: '~$0.10/hr',
     costClass: 'cost-low',
-    completionCode: 'ANL-MOD07-FAULT-ROUTING-COMPLETE',
+    completionPattern: /^ANL-MOD07-[A-F0-9]{8}-COMPLETE$/i,
     unlockedBy: 'mod06',
     path: 'modules/07-fault-routing'
   }
@@ -229,7 +232,7 @@ function openModal(moduleId) {
   document.getElementById('modal-title').textContent = `Module ${mod.num}: Enter Unlock Code`;
   document.getElementById('modal-description').innerHTML =
     `Run <code>validate.ps1</code> in the <code>${mod.path}</code> folder. ` +
-    `If all checks pass, it will print your unlock code. Copy and paste it below.`;
+    `If all checks pass, it will print your unique unlock code. Copy and paste it below.`;
   document.getElementById('token-input').value = '';
   document.getElementById('token-feedback').textContent = '';
   document.getElementById('token-feedback').className = 'token-feedback';
@@ -254,7 +257,7 @@ function submitToken() {
     return;
   }
 
-  if (input !== mod.completionCode) {
+  if (!mod.completionPattern.test(input)) {
     feedback.textContent = '❌ Code not recognised. Check validate.ps1 output for the exact code.';
     feedback.className = 'token-feedback error';
     return;

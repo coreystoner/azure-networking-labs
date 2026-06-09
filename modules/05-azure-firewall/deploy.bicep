@@ -3,9 +3,6 @@
 // Azure Networking Labs
 // =============================================================================
 //
-// Deploys Azure Firewall in the hub VNet with a Firewall Policy containing
-// sample network rules and application rules.
-//
 // IMPORTANT: This template costs approximately $1.25-1.50/hr.
 //            Run cleanup.ps1 -ModuleOnly immediately after completing validation.
 //
@@ -15,16 +12,13 @@
 @description('Azure region. Defaults to resource group location.')
 param location string = resourceGroup().location
 
+@description('Session key used to generate a unique unlock code. Auto-generated on each deployment.')
+param sessionKey string = newGuid()
+
 resource hubVnet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: 'vnet-hub'
 }
 
-// ---------------------------------------------------------------------------
-// AzureFirewallSubnet
-// Azure Firewall requires a subnet named exactly 'AzureFirewallSubnet'.
-// Minimum size: /26 (64 addresses). We use 10.0.4.0/26.
-// The private IP will be 10.0.4.4 (Azure assigns the fourth address).
-// ---------------------------------------------------------------------------
 resource subnetFirewall 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
   parent: hubVnet
   name: 'AzureFirewallSubnet'
@@ -33,9 +27,6 @@ resource subnetFirewall 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' =
   }
 }
 
-// ---------------------------------------------------------------------------
-// Public IP for the firewall
-// ---------------------------------------------------------------------------
 resource pipFirewall 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   name: 'pip-afw-hub'
   location: location
@@ -46,10 +37,6 @@ resource pipFirewall 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Firewall Policy
-// Using Policy (vs Classic rules) — recommended for new deployments.
-// ---------------------------------------------------------------------------
 resource firewallPolicy 'Microsoft.Network/firewallPolicies@2023-09-01' = {
   name: 'afwp-hub'
   location: location
@@ -60,17 +47,12 @@ resource firewallPolicy 'Microsoft.Network/firewallPolicies@2023-09-01' = {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Rule Collection Group: Lab Rules
-// Priority 200 (lower number = higher priority in policy)
-// ---------------------------------------------------------------------------
 resource ruleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2023-09-01' = {
   parent: firewallPolicy
   name: 'lab-rules'
   properties: {
     priority: 200
     ruleCollections: [
-      // Network Rule Collection: allow specific internal traffic
       {
         ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
         name: 'network-rules'
@@ -89,13 +71,12 @@ resource ruleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionG
             ruleType: 'NetworkRule'
             name: 'allow-app-to-data-sql'
             ipProtocols: ['TCP']
-            sourceAddresses: ['10.0.2.0/24']   // snet-app
-            destinationAddresses: ['10.0.3.0/24'] // snet-data
-            destinationPorts: ['1433']            // SQL Server
+            sourceAddresses: ['10.0.2.0/24']
+            destinationAddresses: ['10.0.3.0/24']
+            destinationPorts: ['1433']
           }
         ]
       }
-      // Application Rule Collection: allow FQDN-based outbound
       {
         ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
         name: 'app-rules'
@@ -122,13 +103,11 @@ resource ruleCollectionGroup 'Microsoft.Network/firewallPolicies/ruleCollectionG
   }
 }
 
-// ---------------------------------------------------------------------------
-// Azure Firewall
-// ---------------------------------------------------------------------------
+// afw-hub: primary resource — carries sessionKey tag for validation
 resource azureFirewall 'Microsoft.Network/azureFirewalls@2023-09-01' = {
   name: 'afw-hub'
   location: location
-  tags: { lab: 'azure-networking-labs', module: '05-azure-firewall' }
+  tags: { lab: 'azure-networking-labs', module: '05-azure-firewall', sessionKey: take(toUpper(sessionKey), 8) }
   dependsOn: [subnetFirewall, ruleCollectionGroup]
   properties: {
     sku: {
@@ -148,9 +127,6 @@ resource azureFirewall 'Microsoft.Network/azureFirewalls@2023-09-01' = {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Outputs
-// ---------------------------------------------------------------------------
 output firewallPrivateIp string = azureFirewall.properties.ipConfigurations[0].properties.privateIPAddress
 output firewallPublicIp  string = pipFirewall.properties.ipAddress
 output firewallId        string = azureFirewall.id
