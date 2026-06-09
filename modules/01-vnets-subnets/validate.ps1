@@ -4,7 +4,7 @@
     Validates Module 01: VNets & Subnets completion.
 .DESCRIPTION
     Checks that the expected VNet and subnets exist with the correct configuration,
-    then outputs an unlock code for the learning portal.
+    then outputs a unique unlock code for the learning portal.
 .PARAMETER ResourceGroupName
     The resource group where you deployed the module.
     Default: rg-azure-networking-labs
@@ -37,14 +37,13 @@ Write-Host '  VNets & Subnets                               ' -ForegroundColor C
 Write-Host '=================================================' -ForegroundColor Cyan
 Write-Host ''
 
-# Verify Azure CLI
 if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
     Write-Host '[ERROR] Azure CLI not found.' -ForegroundColor Red
     Write-Host '        Install from: https://aka.ms/installazurecliwindows' -ForegroundColor Yellow
+    Write-Host '        Full setup guide: https://github.com/coreystoner/azure-networking-labs/blob/main/SETUP.md' -ForegroundColor Yellow
     exit 1
 }
 
-# Check logged in
 $account = az account show 2>$null | ConvertFrom-Json
 if (-not $account) {
     Write-Host '[ERROR] Not logged in to Azure. Run: az login' -ForegroundColor Red
@@ -53,9 +52,7 @@ if (-not $account) {
 Write-Host "  Subscription: $($account.name)" -ForegroundColor Gray
 Write-Host ''
 
-# ------------------------------------------------------------------
 # Check 1: Resource Group
-# ------------------------------------------------------------------
 Write-Host '[1/3] Checking resource group...' -ForegroundColor White
 $rg = az group show --name $ResourceGroupName 2>$null | ConvertFrom-Json
 Write-Check "Resource group '$ResourceGroupName' exists" ($null -ne $rg)
@@ -64,13 +61,10 @@ if ($null -eq $rg) {
     Write-Host ''
     Write-Host '[TIP] Create the resource group first:' -ForegroundColor Yellow
     Write-Host "      az group create --name $ResourceGroupName --location eastus" -ForegroundColor Yellow
-    Write-Host '      Then re-run the deployment and this validator.' -ForegroundColor Yellow
     exit 1
 }
 
-# ------------------------------------------------------------------
 # Check 2: Virtual Network
-# ------------------------------------------------------------------
 Write-Host ''
 Write-Host '[2/3] Checking virtual network...' -ForegroundColor White
 $vnet = az network vnet show `
@@ -97,35 +91,41 @@ if ($null -ne $vnet) {
     if ($dataSubnet) { Write-Check 'snet-data prefix is 10.0.3.0/24' ($dataSubnet.addressPrefix -eq '10.0.3.0/24') }
 }
 
-# ------------------------------------------------------------------
-# Check 3: Resource Tags
-# ------------------------------------------------------------------
+# Check 3: Tags
 Write-Host ''
 Write-Host '[3/3] Checking resource tags...' -ForegroundColor White
 if ($null -ne $vnet) {
     Write-Check "VNet tagged with lab='azure-networking-labs'" ($vnet.tags.lab -eq 'azure-networking-labs')
+    Write-Check 'VNet has session key tag (required for unlock code)' (-not [string]::IsNullOrEmpty($vnet.tags.sessionKey))
 }
 
-# ------------------------------------------------------------------
 # Result
-# ------------------------------------------------------------------
 Write-Host ''
 Write-Host '=================================================' -ForegroundColor Cyan
 if ($allPassed) {
+    $sessionKey = $vnet.tags.sessionKey
+    if ([string]::IsNullOrEmpty($sessionKey)) {
+        Write-Host '[ERROR] Session key tag not found. Re-deploy the module:' -ForegroundColor Red
+        Write-Host "        az deployment group create --resource-group $ResourceGroupName --template-file deploy.bicep" -ForegroundColor Yellow
+        exit 1
+    }
+    $unlockCode = "ANL-MOD01-$sessionKey-COMPLETE"
+    $padding = '-' * ($unlockCode.Length + 4)
+    $border  = "  +$padding+"
     Write-Host '  ALL CHECKS PASSED!' -ForegroundColor Green
     Write-Host ''
     Write-Host '  Your Module 01 unlock code:' -ForegroundColor White
     Write-Host ''
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
-    Write-Host '  |  ANL-MOD01-VNETS-COMPLETE             |' -ForegroundColor Yellow
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
+    Write-Host $border   -ForegroundColor Yellow
+    Write-Host "  |  $unlockCode  |" -ForegroundColor Yellow
+    Write-Host $border   -ForegroundColor Yellow
     Write-Host ''
     Write-Host '  Copy this code and paste it into the learning portal.' -ForegroundColor White
     Write-Host '  Module 02 (NSGs) will unlock once you submit it.' -ForegroundColor White
 } else {
     Write-Host '  VALIDATION FAILED' -ForegroundColor Red
     Write-Host ''
-    Write-Host '  Review the failures above, fix the issues, and re-run:' -ForegroundColor Yellow
+    Write-Host '  Review the [FAIL] lines above, fix the issues, and re-run:' -ForegroundColor Yellow
     Write-Host "  az deployment group create --resource-group $ResourceGroupName --template-file deploy.bicep" -ForegroundColor Yellow
 }
 Write-Host '=================================================' -ForegroundColor Cyan

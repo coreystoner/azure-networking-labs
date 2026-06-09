@@ -127,20 +127,19 @@ az network vnet subnet list `
    .\validate.ps1
    ```
 
-4. On success you'll see your unlock code:
+4. On success you'll see a box with your **unique unlock code** for this deployment:
 
    ```
-   +---------------------------------------+
-   |  ANL-MOD01-VNETS-COMPLETE             |
-   +---------------------------------------+
+   +=================================+
+   |  ANL-MOD01-A1B2C3D4-COMPLETE  |
+   +=================================+
    ```
+
+   > The 8-character session ID is unique to your deployment — yours will be different.
 
 5. Copy the code and enter it in the **learning portal** to unlock Module 02.
 
-> **Tip:** If you used a different resource group name, pass it as a parameter:
-> ```powershell
-> .\validate.ps1 -ResourceGroupName my-custom-rg
-> ```
+> **Tip:** Custom resource group? `.\.validate.ps1 -ResourceGroupName my-rg`
 
 ---
 

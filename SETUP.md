@@ -94,15 +94,17 @@ cd modules\01-vnets-subnets
 .\validate.ps1
 ```
 
-On success you'll see:
+On success you'll see a box containing your **unique unlock code** for this deployment:
 
 ```
-+---------------------------------------+
-|  ANL-MOD01-VNETS-COMPLETE             |
-+---------------------------------------+
+  +=================================+
+  |  ANL-MOD01-A1B2C3D4-COMPLETE  |
+  +=================================+
 ```
 
-Copy that code into the learning portal to unlock the next module.
+> **Note:** The 8-character session ID (`A1B2C3D4` above) is unique to your deployment. It is generated at deploy time and cannot be predicted — you must run the deployment and validate.ps1 to get your code.
+
+Copy the code and enter it in the learning portal to unlock the next module.
 
 ---
 
@@ -116,14 +118,10 @@ Copy that code into the learning portal to unlock the next module.
 | `Resource group not found` | Deploy the module first (Option A or B in the module README) |
 | `VALIDATION FAILED` | Read the `[FAIL]` lines — they tell you exactly what's missing |
 | `No subscriptions found` | Make sure you signed into the correct Microsoft account |
+| `Session key tag not found` | Re-deploy the module — old deployments lack the tag |
 
 ---
 
 ## Not Using the CLI?
 
 If you deployed via **Option A (Deploy to Azure portal button)**, you can still validate via CLI — the script just reads what's already deployed. You only need to deploy once.
-
-Alternatively, you can verify manually in the Azure portal:
-1. Go to **Resource Groups** → `rg-azure-networking-labs`
-2. Check that the expected resources exist
-3. Contact your lab instructor for the unlock code if you can't use CLI

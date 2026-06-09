@@ -19,7 +19,7 @@ Write-Host '  Module 05: Azure Firewall Validator' -ForegroundColor Cyan
 Write-Host '=================================================' -ForegroundColor Cyan ; Write-Host ''
 Write-Host '  REMINDER: Run cleanup.ps1 -ModuleOnly after validating!' -ForegroundColor Yellow ; Write-Host ''
 
-if (-not (Get-Command az -ErrorAction SilentlyContinue)) { Write-Host '[ERROR] az not found.' -ForegroundColor Red; exit 1 }
+if (-not (Get-Command az -ErrorAction SilentlyContinue)) { Write-Host '[ERROR] az not found. See SETUP.md.' -ForegroundColor Red; exit 1 }
 
 Write-Host '[1/4] Checking AzureFirewallSubnet...' -ForegroundColor White
 $subnet = az network vnet subnet show --resource-group $ResourceGroupName --vnet-name 'vnet-hub' --name 'AzureFirewallSubnet' 2>$null | ConvertFrom-Json
@@ -34,22 +34,30 @@ Write-Host '' ; Write-Host '[3/4] Checking Azure Firewall...' -ForegroundColor W
 $fw = az network firewall show --resource-group $ResourceGroupName --name 'afw-hub' 2>$null | ConvertFrom-Json
 Write-Check "Azure Firewall 'afw-hub' exists" ($null -ne $fw)
 if ($fw) {
-    $provState = $fw.provisioningState
-    Write-Check "Firewall provisioning state is 'Succeeded'" ($provState -eq 'Succeeded')
-    $privateIp = $fw.ipConfigurations[0].privateIPAddress
-    Write-Check "Firewall private IP is 10.0.4.4" ($privateIp -eq '10.0.4.4')
+    Write-Check "Firewall provisioning state is 'Succeeded'" ($fw.provisioningState -eq 'Succeeded')
+    Write-Check 'Firewall private IP is 10.0.4.4' ($fw.ipConfigurations[0].privateIPAddress -eq '10.0.4.4')
+    Write-Check 'Firewall has session key tag' (-not [string]::IsNullOrEmpty($fw.tags.sessionKey))
 }
 
 Write-Host '' ; Write-Host '[4/4] Checking Public IP...' -ForegroundColor White
 $pip = az network public-ip show --resource-group $ResourceGroupName --name 'pip-afw-hub' 2>$null | ConvertFrom-Json
 Write-Check "Public IP 'pip-afw-hub' exists" ($null -ne $pip)
 
+# Result
 Write-Host '' ; Write-Host '=================================================' -ForegroundColor Cyan
 if ($allPassed) {
+    $sessionKey = $fw.tags.sessionKey
+    if ([string]::IsNullOrEmpty($sessionKey)) {
+        Write-Host '[ERROR] Session key tag not found. Re-deploy the module.' -ForegroundColor Red; exit 1
+    }
+    $unlockCode = "ANL-MOD05-$sessionKey-COMPLETE"
+    $padding = '-' * ($unlockCode.Length + 4)
+    $border  = "  +$padding+"
     Write-Host '  ALL CHECKS PASSED!' -ForegroundColor Green ; Write-Host ''
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
-    Write-Host '  |  ANL-MOD05-FIREWALL-COMPLETE          |' -ForegroundColor Yellow
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
+    Write-Host '  Your Module 05 unlock code:' -ForegroundColor White ; Write-Host ''
+    Write-Host $border -ForegroundColor Yellow
+    Write-Host "  |  $unlockCode  |" -ForegroundColor Yellow
+    Write-Host $border -ForegroundColor Yellow
     Write-Host ''
     Write-Host '  *** IMPORTANT: Delete the firewall now to stop charges! ***' -ForegroundColor Red
     Write-Host '  Run: .\cleanup.ps1 -ModuleOnly' -ForegroundColor Yellow

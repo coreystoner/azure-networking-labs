@@ -21,7 +21,7 @@ Write-Host '' ; Write-Host '=================================================' -
 Write-Host '  Module 07: Fault Lab Routing -- Validator' -ForegroundColor Cyan
 Write-Host '=================================================' -ForegroundColor Cyan ; Write-Host ''
 
-if (-not (Get-Command az -ErrorAction SilentlyContinue)) { Write-Host '[ERROR] az not found.' -ForegroundColor Red; exit 1 }
+if (-not (Get-Command az -ErrorAction SilentlyContinue)) { Write-Host '[ERROR] az not found. See SETUP.md.' -ForegroundColor Red; exit 1 }
 
 Write-Host '[1/2] Checking route table exists...' -ForegroundColor White
 $rt = az network route-table show --resource-group $ResourceGroupName --name 'rt-web-fault' 2>$null | ConvertFrom-Json
@@ -35,18 +35,26 @@ if ($null -ne $rt) {
         $nhType = $internetRoute.properties.nextHopType
         Write-Check "Next-hop type is 'Internet' (was 'None')" ($nhType -eq 'Internet')
         if ($nhType -eq 'None') {
-            Write-Host "  [TIP] The route is still set to 'None'. Run:" -ForegroundColor Yellow
-            Write-Host "        az network route-table route update --resource-group $ResourceGroupName --route-table-name rt-web-fault --name route-to-internet --next-hop-type Internet" -ForegroundColor Yellow
+            Write-Host "  [TIP] Run: az network route-table route update --resource-group $ResourceGroupName --route-table-name rt-web-fault --name route-to-internet --next-hop-type Internet" -ForegroundColor Yellow
         }
     }
 }
 
+# Result
 Write-Host '' ; Write-Host '=================================================' -ForegroundColor Cyan
 if ($allPassed) {
+    $sessionKey = $rt.tags.sessionKey
+    if ([string]::IsNullOrEmpty($sessionKey)) {
+        Write-Host '[ERROR] Session key tag not found. Re-deploy the module.' -ForegroundColor Red; exit 1
+    }
+    $unlockCode = "ANL-MOD07-$sessionKey-COMPLETE"
+    $padding = '-' * ($unlockCode.Length + 4)
+    $border  = "  +$padding+"
     Write-Host '  ALL CHECKS PASSED! Routing fault fixed.' -ForegroundColor Green ; Write-Host ''
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
-    Write-Host '  |  ANL-MOD07-FAULT-ROUTING-COMPLETE     |' -ForegroundColor Yellow
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
+    Write-Host '  Your Module 07 unlock code:' -ForegroundColor White ; Write-Host ''
+    Write-Host $border -ForegroundColor Yellow
+    Write-Host "  |  $unlockCode  |" -ForegroundColor Yellow
+    Write-Host $border -ForegroundColor Yellow
     Write-Host ''
     Write-Host '  Congratulations! You have completed all 7 modules.' -ForegroundColor Green
     Write-Host '  Check the portal for your full completion status.' -ForegroundColor White

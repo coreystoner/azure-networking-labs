@@ -21,7 +21,7 @@ Write-Host '' ; Write-Host '=================================================' -
 Write-Host '  Module 06: Fault Lab NSG -- Validator' -ForegroundColor Cyan
 Write-Host '=================================================' -ForegroundColor Cyan ; Write-Host ''
 
-if (-not (Get-Command az -ErrorAction SilentlyContinue)) { Write-Host '[ERROR] az not found.' -ForegroundColor Red; exit 1 }
+if (-not (Get-Command az -ErrorAction SilentlyContinue)) { Write-Host '[ERROR] az not found. See SETUP.md.' -ForegroundColor Red; exit 1 }
 
 Write-Host '[1/3] Checking NSG exists...' -ForegroundColor White
 $nsg = az network nsg show --resource-group $ResourceGroupName --name 'nsg-web-fault' 2>$null | ConvertFrom-Json
@@ -36,7 +36,7 @@ if ($null -ne $nsg) {
     }
     Write-Check 'Allow-HTTP-Inbound rule exists' ($null -ne $allowHttp)
 
-    Write-Host '' ; Write-Host '[3/3] Checking Block-All rule priority is HIGHER than Allow-HTTP...' -ForegroundColor White
+    Write-Host '' ; Write-Host '[3/3] Checking Block-All priority is HIGHER than Allow-HTTP...' -ForegroundColor White
     $blockAll = $nsg.securityRules | Where-Object {
         $_.properties.access -eq 'Deny' -and
         $_.properties.direction -eq 'Inbound' -and
@@ -49,16 +49,25 @@ if ($null -ne $nsg) {
             ($blockPriority -gt $allowPriority)
         Write-Check 'Allow-HTTP priority is <= 200 (reasonable value)' ($allowPriority -le 200)
     } elseif ($null -eq $blockAll) {
-        Write-Host '  [INFO] Block-All rule not found (may have been deleted -- also acceptable)' -ForegroundColor Cyan
+        Write-Host '  [INFO] Block-All rule not found (deleted -- also acceptable)' -ForegroundColor Cyan
     }
 }
 
+# Result
 Write-Host '' ; Write-Host '=================================================' -ForegroundColor Cyan
 if ($allPassed) {
+    $sessionKey = $nsg.tags.sessionKey
+    if ([string]::IsNullOrEmpty($sessionKey)) {
+        Write-Host '[ERROR] Session key tag not found. Re-deploy the module.' -ForegroundColor Red; exit 1
+    }
+    $unlockCode = "ANL-MOD06-$sessionKey-COMPLETE"
+    $padding = '-' * ($unlockCode.Length + 4)
+    $border  = "  +$padding+"
     Write-Host '  ALL CHECKS PASSED! Fault found and fixed.' -ForegroundColor Green ; Write-Host ''
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
-    Write-Host '  |  ANL-MOD06-FAULT-NSG-COMPLETE         |' -ForegroundColor Yellow
-    Write-Host '  +---------------------------------------+' -ForegroundColor Yellow
+    Write-Host '  Your Module 06 unlock code:' -ForegroundColor White ; Write-Host ''
+    Write-Host $border -ForegroundColor Yellow
+    Write-Host "  |  $unlockCode  |" -ForegroundColor Yellow
+    Write-Host $border -ForegroundColor Yellow
     Write-Host '' ; Write-Host '  Enter this in the portal to unlock Module 07.' -ForegroundColor White
 } else {
     Write-Host '  NOT FIXED YET -- check the hints in README.md.' -ForegroundColor Red
