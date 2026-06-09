@@ -1,7 +1,5 @@
 # Module 05: Azure Firewall
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F05-azure-firewall%2Fdeploy.bicep)
-
 ## ⚠️ Cost Warning
 
 **Azure Firewall costs approximately $1.25–$1.50/hr.** Run `cleanup.ps1 -ModuleOnly` immediately after completing validation.
@@ -52,7 +50,9 @@ Evaluation order: DNAT → Network → Application. First match wins.
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-Click the badge at the top of this page. Deployment takes **5–10 minutes**.
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F05-azure-firewall%2Fdeploy.json)
+
+Deployment takes **5–10 minutes**. You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
 ### ⚡ Option B — Automated Script
 

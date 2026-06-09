@@ -1,7 +1,5 @@
 # Module 07: Fault Lab — Routing
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F07-fault-routing%2Fdeploy.bicep)
-
 ## Scenario
 
 A VM in the `snet-web` subnet has lost internet connectivity. The networking team insists the route table is configured correctly with a route to the internet. You've been asked to investigate.
@@ -52,7 +50,9 @@ az network route-table route update \
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-Click the badge at the top of this page.
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F07-fault-routing%2Fdeploy.json)
+
+You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
 ### ⚡ Option B — Automated Script
 

@@ -1,7 +1,5 @@
 # Module 06: Fault Lab — NSG
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F06-fault-nsg%2Fdeploy.bicep)
-
 ## Scenario
 
 Your team has deployed a web application in a new subnet. The NSG team claims they've added an inbound rule to allow HTTP traffic (port 80) from the internet. However, **no HTTP traffic is getting through**.
@@ -56,7 +54,9 @@ az network nsg rule update \
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-Click the badge at the top of this page.
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F06-fault-nsg%2Fdeploy.json)
+
+You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
 ### ⚡ Option B — Automated Script
 

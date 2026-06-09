@@ -20,17 +20,15 @@ A self-paced, gamified learning series for IT pros and sysadmins building Azure 
 
 ## Module Overview
 
-> **Note:** Each module has two template files: `deploy.json` (ARM — used by the portal button) and `deploy.bicep` (used by the CLI scripts). Both deploy identical resources.
-
-| # | Module | Topics | Est. Cost | Deploy |
-|---|--------|---------|:---------:|:------:|
-| [01](./modules/01-vnets-subnets/) | VNets & Subnets | Address spaces, CIDR, subnet design | ~$0.00/hr ✅ | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.json) |
-| [02](./modules/02-nsgs/) | Network Security Groups | Rules, priorities, default rules | ~$0.00/hr ✅ | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F02-nsgs%2Fdeploy.json) |
-| [03](./modules/03-peering/) | VNet Peering | Hub-spoke topology, peering states | ~$0.00/hr ✅ | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F03-peering%2Fdeploy.json) |
-| [04](./modules/04-routing-udrs/) | Routing & UDRs | Route tables, next-hop types | ~$0.00/hr ✅ | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F04-routing-udrs%2Fdeploy.json) |
-| [05](./modules/05-azure-firewall/) | Azure Firewall | Firewall policies, DNAT, app rules | ~$1.50/hr ⚠️ | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F05-azure-firewall%2Fdeploy.json) |
-| [06](./modules/06-fault-nsg/) | Fault Lab: NSG | Find & fix a broken NSG config | ~$0.00/hr 🔧 | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F06-fault-nsg%2Fdeploy.json) |
-| [07](./modules/07-fault-routing/) | Fault Lab: Routing | Find & fix a broken route table | ~$0.00/hr 🔧 | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F07-fault-routing%2Fdeploy.json) |
+| # | Module | Topics | Est. Cost |
+|---|--------|---------|:---------:|
+| [01](./modules/01-vnets-subnets/) | VNets & Subnets | Address spaces, CIDR, subnet design | ~$0.00/hr ✅ |
+| [02](./modules/02-nsgs/) | Network Security Groups | Rules, priorities, default rules | ~$0.00/hr ✅ |
+| [03](./modules/03-peering/) | VNet Peering | Hub-spoke topology, peering states | ~$0.00/hr ✅ |
+| [04](./modules/04-routing-udrs/) | Routing & UDRs | Route tables, next-hop types | ~$0.00/hr ✅ |
+| [05](./modules/05-azure-firewall/) | Azure Firewall | Firewall policies, DNAT, app rules | ~$1.50/hr ⚠️ |
+| [06](./modules/06-fault-nsg/) | Fault Lab: NSG | Find & fix a broken NSG config | ~$0.00/hr 🔧 |
+| [07](./modules/07-fault-routing/) | Fault Lab: Routing | Find & fix a broken route table | ~$0.00/hr 🔧 |
 
 > ⚠️ **Cost Note:** Modules 01–04 and 06–07 deploy only VNets, subnets, NSGs, and route tables — these are **free** in Azure. Module 05 deploys an Azure Firewall (~$1.50/hr) and should be cleaned up promptly. Each module includes a detailed cost estimate and a cleanup script.
 
@@ -38,11 +36,19 @@ A self-paced, gamified learning series for IT pros and sysadmins building Azure 
 
 ## Deployment Options
 
-### Option A — One-click (Deploy to Azure button)
+### Option A — One-click (Deploy to Azure)
 
-Click the **Deploy to Azure** button in the table above. You'll be taken directly to the Azure portal custom deployment page — log in, select your subscription and resource group, and click **Review + Create**.
+Click a button below to deploy that module directly in the Azure portal. Log in, select your subscription and resource group, then click **Review + Create**.
 
-> The portal uses `deploy.json` (ARM JSON format). This is identical in function to the Bicep template.
+| Module | Deploy |
+|--------|:------:|
+| 01 — VNets & Subnets | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.json) |
+| 02 — Network Security Groups | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F02-nsgs%2Fdeploy.json) |
+| 03 — VNet Peering | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F03-peering%2Fdeploy.json) |
+| 04 — Routing & UDRs | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F04-routing-udrs%2Fdeploy.json) |
+| 05 — Azure Firewall ⚠️ | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F05-azure-firewall%2Fdeploy.json) |
+| 06 — Fault Lab: NSG | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F06-fault-nsg%2Fdeploy.json) |
+| 07 — Fault Lab: Routing | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F07-fault-routing%2Fdeploy.json) |
 
 ### Option B — Automated Script (Recommended for beginners)
 

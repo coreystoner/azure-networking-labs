@@ -1,7 +1,5 @@
 # Module 04: Routing & User Defined Routes (UDRs)
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F04-routing-udrs%2Fdeploy.bicep)
-
 ## Learning Objectives
 
 - Describe Azure system routes and when they are created automatically
@@ -53,7 +51,9 @@ UDRs let you **override** system routes. Common uses:
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-Click the badge at the top of this page.
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F04-routing-udrs%2Fdeploy.json)
+
+You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
 ### ⚡ Option B — Automated Script
 

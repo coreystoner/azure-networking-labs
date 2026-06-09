@@ -1,7 +1,5 @@
 # Module 01: VNets & Subnets
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.bicep)
-
 ## Learning Objectives
 
 By the end of this module you will be able to:
@@ -56,7 +54,9 @@ This separation makes it easy to apply different NSG rules (Module 02) to each t
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-Click the badge at the top of this page. You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F01-vnets-subnets%2Fdeploy.json)
+
+You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
 ### ⚡ Option B — Automated Script (Easiest for CLI)
 
@@ -78,7 +78,6 @@ az login
 az group create --name rg-azure-networking-labs --location eastus
 
 # Deploy
-cd modules/01-vnets-subnets
 az deployment group create --resource-group rg-azure-networking-labs --template-file deploy.bicep
 ```
 

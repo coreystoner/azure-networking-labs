@@ -1,7 +1,5 @@
 # Module 02: Network Security Groups
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F02-nsgs%2Fdeploy.bicep)
-
 ## Learning Objectives
 
 - Explain how NSG rules are evaluated (priority order, stateful matching)
@@ -56,7 +54,9 @@ Every NSG contains these at the bottom (high priority numbers, evaluated last):
 
 ### 🚀 Option A — One-click (Deploy to Azure)
 
-Click the badge at the top of this page.
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoreystoner%2Fazure-networking-labs%2Fmain%2Fmodules%2F02-nsgs%2Fdeploy.json)
+
+You'll be taken to the Azure portal — select your subscription and resource group, then click **Review + Create**.
 
 ### ⚡ Option B — Automated Script
 
